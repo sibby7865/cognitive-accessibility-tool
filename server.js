@@ -37,10 +37,21 @@ let sharedBrowser = null;
 // Helper to get (or launch) a single Puppeteer Browser
 async function getBrowser() {
   if (!sharedBrowser) {
+    // sharedBrowser = await puppeteer.launch({
+    //   headless: true,
+    //   args: ["--no-sandbox", "--disable-setuid-sandbox"]
+    // });
     sharedBrowser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"]
-    });
+  headless: true,
+  executablePath: "/usr/bin/chromium",
+  args: [
+    "--no-sandbox",
+    "--disable-setuid-sandbox",
+    // reduce memory usage:
+    "--disable-dev-shm-usage"
+  ]
+});
+
   }
   return sharedBrowser;
 }
