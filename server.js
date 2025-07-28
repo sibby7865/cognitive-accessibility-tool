@@ -52,15 +52,21 @@ async function getBrowser() {
 //   ]
 // });
 
+// sharedBrowser = await puppeteer.launch({
+//   headless: true,
+//   executablePath: "/usr/bin/chromium-browser",
+//   args: [
+//     "--no-sandbox",
+//     "--disable-setuid-sandbox",
+//     "--disable-dev-shm-usage"
+//   ]
+// });
+
 sharedBrowser = await puppeteer.launch({
   headless: true,
-  executablePath: "/usr/bin/chromium-browser",
-  args: [
-    "--no-sandbox",
-    "--disable-setuid-sandbox",
-    "--disable-dev-shm-usage"
-  ]
+  args: ["--no-sandbox","--disable-setuid-sandbox","--disable-dev-shm-usage"]
 });
+
 
   }
   return sharedBrowser;
