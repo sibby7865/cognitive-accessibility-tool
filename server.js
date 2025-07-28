@@ -41,13 +41,23 @@ async function getBrowser() {
     //   headless: true,
     //   args: ["--no-sandbox", "--disable-setuid-sandbox"]
     // });
-    sharedBrowser = await puppeteer.launch({
+//     sharedBrowser = await puppeteer.launch({
+//   headless: true,
+//   executablePath: "/usr/bin/chromium",
+//   args: [
+//     "--no-sandbox",
+//     "--disable-setuid-sandbox",
+//     // reduce memory usage:
+//     "--disable-dev-shm-usage"
+//   ]
+// });
+
+sharedBrowser = await puppeteer.launch({
   headless: true,
-  executablePath: "/usr/bin/chromium",
+  executablePath: "/usr/bin/chromium-browser",
   args: [
     "--no-sandbox",
     "--disable-setuid-sandbox",
-    // reduce memory usage:
     "--disable-dev-shm-usage"
   ]
 });
