@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Home | Cognitive Accessibility Tool</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- =============================================================================
+       HEADER & NAVIGATION
+       ============================================================================= -->
+  <header>
+    <div class="header-container">
+      <h1>Homepage</h1>
+      <nav aria-label="Main Navigation">
+        <a href="home.html" aria-current="page">Home</a>
+        <a href="index.html">Accessibility Evaluation</a>
+        <a href="readability.html">Readability Checker</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =============================================================================
+       MAIN CONTENT
+       ============================================================================= -->
+  <main class="container" role="main">
+    <!-- =============================================================================
+         INTRODUCTION CARD
+         ============================================================================= -->
+   <div class="card" aria-labelledby="intro-heading">
+  <h2 id="intro-heading">Introduction</h2>
+  <p>
+    Welcome to the Cognitive Accessibility Tool. This tool helps you find and fix barriers
+    that make websites hard to use for people with cognitive differences. To use it,
+    enter a URL and click Scan to generate a detailed report of potential issues.
+  </p>
+  <p>
+    You will receive clear recommendations written in plain language, with examples showing
+    where each issue appears. Each recommendation explains why the issue matters and how
+    to address it effectively. After making changes you can rescan your page to confirm
+    that all critical issues are resolved.
+  </p>
+  <p>
+    Our goal is to help you create a more inclusive and accessible online experience for
+    all users.
+  </p>
+</div>
+
+
+    <!-- =============================================================================
+         PURPOSE CARD
+         ============================================================================= -->
+  <div class="card" aria-labelledby="purpose-heading">
+  <h2 id="purpose-heading">Purpose of the Tool</h2>
+  <p>
+    Many websites include design and content choices that unintentionally make
+    reading and navigation harder for people with dyslexia, ADHD, or memory
+    difficulties. This tool helps you identify those specific barriers on any
+    webpage.
+  </p>
+  <p>
+    Most accessibility checkers focus on technical code compliance and often
+    overlook how content feels to users with cognitive differences. This tool
+    takes a different approach by combining targeted cognitive checks with a
+    built-in Readability Checker that measures reading age and ease of
+    understanding.
+  </p>
+  <p>
+    It provides clear, practical recommendations in plain English, with examples
+    that show exactly what to change and why.
+  </p>
+  <p>
+    Some coding knowledge is helpful, but the tool explains things where needed
+    so that writers, designers, and editors can all use it confidently. You can
+    scan, revise, and repeat until your site is easier to read, navigate, and
+    understand for everyone.
+  </p>
+</div>
+
+
+    <!-- =============================================================================
+         FEATURES CARD
+         ============================================================================= -->
+  <div class="card" aria-labelledby="features-heading">
+  <h2 id="features-heading">Key Features</h2>
+  <ul>
+    <li>
+      <strong>Profile-Driven Checks:</strong>
+      Select from General, Dyslexia, ADHD, or Memory profiles. Each scan runs checks
+      tailored to that specific need, focusing only on what matters most for the
+      chosen profile.
+    </li>
+    <li>
+      <strong>Instant, Live Scanning:</strong>
+      Enter any URL and get results within seconds. There’s no setup, installation,
+      or sign-up required.
+    </li>
+    <li>
+      <strong>Plain-English Recommendations:</strong>
+      Receive clear explanations of what to fix and why, with examples to guide you.
+    </li>
+    <li>
+      <strong>Integrated Readability Checker:</strong>
+      View UK reading-age and reading-ease scores, with colour-coded paragraph-level
+      feedback to help you spot content that may be too complex.
+    </li>
+  </ul>
+</div>
+
+
+    <!-- =============================================================================
+         DIFFERENCE CARD
+         ============================================================================= -->
+    <div class="card" aria-labelledby="difference-heading">
+  <h2 id="difference-heading">How This Tool Is Different to Existing Tools?</h2>
+  <p>
+    Most accessibility tools such as Google Lighthouse or axe-core are built around
+    code-level checks (missing ARIA attributes, semantic HTML errors, color-contrast
+    ratios). They tell you what breaks a guideline but say little about how your
+    content actually feels to someone with dyslexia, ADHD, or memory challenges.
+  </p>
+  <p>
+    Our scanner takes a user-centered approach. You begin by selecting a profile:
+    General, Dyslexia, ADHD, or Memory and the tool runs only the checks most
+    relevant to that group. This keeps your report focused and fast, rather than
+    overwhelming you with hundreds of unrelated issues.
+  </p>
+  <p>
+    Every finding comes with a plain-English explanation and a concrete example of
+    where to make the change. You won’t see pages of technical jargon, just clear
+    guidance on what to fix and why it matters, backed by a snippet from your own page.
+  </p>
+  <p>
+    We also include a Readability Checker powered by the Flesch–Kincaid formulas.
+    You receive both a UK reading-age score and a 0–100 reading-ease score, with
+    colour-coded feedback at the paragraph level. This lets you spot dense or
+    confusing passages.
+  </p>
+  <p>
+    No complex setup, no custom scripts, and no lengthy batch reports. Scan any URL
+    in seconds, apply the practical recommendations, then re-scan immediately to
+    confirm your improvements. This rapid iteration workflow helps you keep
+    accessibility at the forefront of your design process.
+  </p>
+</div>
+
+
+    <!-- =============================================================================
+         OVERVIEW CARD (with example table)
+         ============================================================================= -->
+
+  <div class="card" aria-labelledby="overview-heading">
+  <h2 id="overview-heading">How the Scan Works</h2>
+  <p>
+    1. Select a Profile: Choose General, Dyslexia, ADHD, or Memory to tailor
+    the checks for your audience.
+  </p>
+  <p>
+    2. Enter a URL and Click Scan: The tool crawls your page and evaluates only
+    the selected checks in seconds.
+  </p>
+  <p>
+    3. Review Your Results: Each row shows the issue name, count,
+    recommendation, issue location snippet, and guidance for interpreting that example.
+  </p>
+  <p>
+    4. Implement Fixes and Re-scan: Update your content or code, then run another
+    scan to confirm all critical issues have been resolved.
+  </p>
+
+  <p>
+    Below is a sample row illustrating the output:
+  </p>
+
+  <table aria-describedby="overview-heading">
+    <caption>Each result shows the issue, occurrence, clear fix, sample location, and interpretation.</caption>
+     <br>
+    <thead>
+      <tr>
+        <th>Issue Name</th>
+        <th>Count</th>
+        <th>Recommendation</th>
+        <th>Issue Location</th>
+        <th>Understanding Issue Locations</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Long Sentences</td>
+        <td>1 of 10 (10%)</td>
+        <td>Break long sentences into shorter ones.</td>
+        <td>
+          <a class="example-link" href="#" target="_blank">
+           This sentence is too long and should be broken into shorter parts to make it easier to read understand and follow especially for people with cognitive difficulties or attention challenges
+          </a>
+        </td>
+        <td>
+          Each location shows a sentence over 25 words. Long sentences are harder to process, especially for users with cognitive difficulties. Break them into shorter sentences to improve clarity.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+    <!-- =============================================================================
+         PROFILES SUMMARY CARD
+         ============================================================================= -->
+    <div class="card" aria-labelledby="profiles-heading">
+  <h2 id="profiles-heading">Profiles at a Glance</h2>
+  <p>
+    <strong>General:</strong>
+    Runs every check from the Dyslexia, ADHD, and Memory profiles combined
+    for a full, comprehensive scan.
+  </p>
+  <p>
+    <strong>Dyslexia:</strong>
+    Targets long sentences, complex words, and unclear headings to simplify
+    and structure your content.
+  </p>
+  <p>
+    <strong>ADHD:</strong>
+    Flags autoplay media, flashing content, and dense text to reduce
+    distractions and cognitive overload.
+  </p>
+  <p>
+    <strong>Memory Difficulties:</strong>
+    Ensures your site has logical, consistent headings; clear, easy-to-use
+    navigation; and summary or overview sections so users can quickly remember
+    and return to key information.
+  </p>
+</div>
+
+    <!-- =============================================================================
+         READABILITY CARD
+         ============================================================================= -->
+ <div class="card" aria-labelledby="readability-heading">
+  <h2 id="readability-heading">Readability Checker</h2>
+  <p>
+    Even well-designed pages can include dense or complex text. Our Readability
+    Checker evaluates two key metrics:
+  </p>
+  <ul>
+    <li>
+      <strong>UK Reading Age:</strong>
+      The school year or age range at which most readers can understand the text.
+    </li>
+    <li>
+      <strong>Reading Ease:</strong>
+      A score from 0–100. Higher scores mean the text is easier to read and understand.
+    </li>
+  </ul>
+  <p>
+    Each paragraph is highlighted in green (easy), amber (moderate), or red
+    (difficult) so you can spot problem areas at a glance. Use the “Show
+    Problems Only” filter to focus on paragraphs below your target threshold.
+  </p>
+
+  <h3>Understanding the Flesch Formulas</h3>
+
+  <p>
+    Flesch readability tests work by analysing sentence length and word complexity.
+    The mathematical formulas underlying the two scores look like this:
+  </p>
+
+  <figure>
+    <img
+      src="assets/fleschReadingEase.jpg"
+      alt="Formula for Flesch Reading Ease: 206.835 – 1.015 (total words / total sentences) – 84.6 (total syllables / total words)"
+    />
+    <figcaption>Flesch Reading Ease formula</figcaption>
+  </figure>
+  <figure>
+    <img
+      src="assets/fleschKincaid.jpg"
+      alt="Formula for Flesch–Kincaid Grade Level: 0.39 (total words / total sentences) + 11.8 (total syllables / total words) – 15.59"
+    />
+    <figcaption>Flesch–Kincaid Grade Level formula</figcaption>
+  </figure>
+  <p>
+    We use the Flesch–Kincaid Grade Level formula which is a widely used readability
+    test that estimates the reading grade level of a text based on average
+    sentence length and word complexity.
+    <a
+      href="https://readable.com/readability/flesch-reading-ease-flesch-kincaid-grade-level/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      Learn more about Flesch–Kincaid formulas
+    </a>.
+  </p>
+</div>
+
+    <!-- =============================================================================
+         GETTING STARTED CARD
+         ============================================================================= -->
+  <div class="card" aria-labelledby="getting-started-heading">
+  <h2 id="getting-started-heading">Getting Started</h2>
+  <ol>
+    <li>
+      <strong>Run a scan:</strong> Go to <strong>Accessibility Evaluation</strong>, choose a profile, enter your page’s URL, and click <strong>Scan</strong>.
+    </li>
+    <li>
+      <strong>Review your issues:</strong> Look at each flagged problem, note how many times it occurs, and read the plain-English recommendation.
+    </li>
+    <li>
+      <strong>Apply fixes:</strong> Update your site content or code based on those suggestions, then scan again until no critical issues remain.
+    </li>
+    <li>
+      <strong>Check readability:</strong> Switch to <strong>Readability Checker</strong>, enter the same URL, and review your UK reading-age and ease scores.
+    </li>
+  </ol>
+</div>
+
+  </main>
+</body>
+</html>

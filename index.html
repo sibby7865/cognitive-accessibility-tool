@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cognitive Accessibility Evaluation</title>
+  <!-- Shared stylesheet -->
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    /* Button that looks like a link for “…and X more” */
+    button.show-all {
+      background: none;
+      border: none;
+      padding: 0;
+      color: var(--color-primary);
+      text-decoration: underline;
+      font: inherit;
+      cursor: pointer;
+    }
+    button.show-all:hover,
+    button.show-all:focus {
+      color: var(--color-primary-hover);
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <h1>Cognitive Accessibility Evaluation</h1>
+      <nav aria-label="Main Navigation">
+        <a href="home.html">Home</a>
+        <a href="index.html" aria-current="page">Cognitive Accessibility Evaluation</a>
+        <a href="readability.html">Readability Checker</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" role="main">
+    <div class="card" aria-labelledby="scan-form-heading">
+      <h2 id="scan-form-heading"
+          style="margin-bottom:1rem; font-size:1.25rem; color:var(--color-text);">
+        Run a Cognitive Accessibility Scan
+      </h2>
+      <form id="scan-form">
+        <label for="profile">Choose Profile:</label>
+        <select id="profile" aria-describedby="profile-description">
+          <option value="general" selected>General</option>
+          <option value="dyslexia">Dyslexia</option>
+          <option value="ADHD">ADHD</option>
+          <option value="memory">Memory Difficulties</option>
+        </select>
+
+        <div id="profile-description"
+             style="width:100%; text-align:center; margin-top:var(--spacing-xs);
+                    font-size:0.9rem; color:var(--color-muted); font-style:italic;">
+          Runs all checks for basic cognitive accessibility.
+        </div>
+
+        <fieldset id="criteria-fieldset" class="rule-panel">
+          <!-- JS will populate the legend + .checkbox-list here -->
+        </fieldset>
+
+        <label for="url" class="visually-hidden">Website URL</label>
+        <input
+          type="text"
+          id="url"
+          placeholder="Enter website URL (e.g., https://example.com)"
+          aria-required="true"
+          required
+        />
+
+        <button type="submit">Scan</button>
+      </form>
+
+      <div id="loading" style="display: none;" aria-live="polite">
+        🔍 Scanning, please wait...
+      </div>
+    </div>
+
+    <div id="results-container" role="region" aria-labelledby="results-heading">
+      <!-- Results go here -->
+    </div>
+  </main>
+
+  <script>
+    const profileInfo = {
+      general: "Runs all checks for basic cognitive accessibility.",
+      dyslexia:
+        "Dyslexia Profile: Focuses on shorter sentences, simpler vocabulary, and clear headings.",
+      ADHD:
+        "ADHD Profile: Flags autoplay, flashing content, and complex language to reduce distraction.",
+      memory:
+        "Memory Profile: Checks for clear navigation, summaries, and consistent structure."
+    };
+
+    const profilesMap = {
+      general: [
+        "autoplayVideos",
+        "longSentences",
+        "h1Missing",
+        "vagueLinkText",
+        "formFieldsWithoutLabels",
+        "timeBasedContent",
+        "blinkingOrMarquee",
+        "missingCaptions",
+        "noEasyToReadSummaries",
+        "missingNavContainer",
+        "tooManyNavLinks",
+        "complexVocabulary",
+        "fontFamilySansSerif",
+        "minFontSize",
+        "letterSpacing",
+        "darkOnLight",
+        "textAlignment",
+        "noUnderlinesItalics",
+        "noUnpredictableBehavior",
+        "noAutoContentRefresh",
+        "rapidFlashes"
+      ],
+      dyslexia: [
+        "longSentences",
+        "h1Missing",
+        "vagueLinkText",
+        "missingCaptions",
+        "complexVocabulary",
+        "fontFamilySansSerif",
+        "minFontSize",
+        "letterSpacing",
+        "darkOnLight",
+        "textAlignment",
+        "noUnderlinesItalics"
+      ],
+      ADHD: [
+        "autoplayVideos",
+        "blinkingOrMarquee",
+        "missingCaptions",
+        "longSentences",
+        "vagueLinkText",
+        "complexVocabulary",
+        "tooManyNavLinks",
+        "noUnpredictableBehavior",
+        "noAutoContentRefresh",
+        "rapidFlashes"
+      ],
+      memory: [
+        "h1Missing",
+        "missingNavContainer",
+        "missingCaptions",
+        "noEasyToReadSummaries",
+        "longSentences",
+        "vagueLinkText",
+        "tooManyNavLinks"
+      ]
+    };
+
+    const ruleTitles = {
+      autoplayVideos:          "Autoplay Videos",
+      longSentences:           "Long Sentences (>25 words)",
+      h1Missing:               "H1 Missing",
+      vagueLinkText:           "Vague Link Text",
+      formFieldsWithoutLabels: "Form Fields without Labels",
+      timeBasedContent:        "Time-based Content",
+      blinkingOrMarquee:       "Blinking or Marquee Tags",
+      missingCaptions:         "Missing Captions for Media",
+      noEasyToReadSummaries:   "No Easy-to-Read Summaries",
+      missingNavContainer:     "Missing Nav Container",
+      tooManyNavLinks:         "Too Many Navigation Links",
+      complexVocabulary:       "Complex Vocabulary",
+      fontFamilySansSerif:     "Accessible Font Family",
+      minFontSize:             "Minimum Font Size (≥16 px)",
+      letterSpacing:           "Letter Spacing (≥0.35× font-size)",
+      darkOnLight:             "Dark Text on Light Background",
+      textAlignment:           "Left-Aligned Text (No Justification)",
+      noUnderlinesItalics:     "Avoid Underlines & Italics",
+      noUnpredictableBehavior: "Avoid Unpredictable Behavior",
+      noAutoContentRefresh:    "Avoid Auto-Refreshing Content",
+      rapidFlashes:            "Rapid-Flashing Content"
+    };
+
+    // Helpers
+    function escapeHTML(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+    function makeTextFragment(text) {
+      const words = text.trim().split(/\s+/);
+      return encodeURIComponent(words.slice(0, 5).join(" "));
+    }
+    function videoLinkFromHTML(html) {
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const src =
+        doc.querySelector("source")?.src ||
+        doc.querySelector("source")?.getAttribute("data-src");
+      return src
+        ? `<a class="example-link" href="${src}" target="_blank" rel="noopener noreferrer">${src}</a>`
+        : `<pre>${escapeHTML(html)}</pre>`;
+    }
+    function imageLinkFromHTML(html) {
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const src = doc.querySelector("img")?.src;
+      return src
+        ? `<a class="example-link" href="${src}" target="_blank" rel="noopener noreferrer">${src}</a>`
+        : `<pre>${escapeHTML(html)}</pre>`;
+    }
+
+    // DOM references
+    const profileSelect      = document.getElementById("profile");
+    const profileDescription = document.getElementById("profile-description");
+    const criteriaFieldset   = document.getElementById("criteria-fieldset");
+
+    // Render the checkbox list for the given profile
+    function renderCriteria(profile) {
+      const ids = profilesMap[profile] || [];
+      criteriaFieldset.innerHTML = `
+        <legend>Select checks to run:</legend>
+        <div class="checkbox-list">
+          ${ids.map(id => `
+            <label>
+              <input type="checkbox" value="${id}" checked>
+              ${escapeHTML(ruleTitles[id] || id)}
+            </label>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    profileSelect.addEventListener("change", () => {
+      const prof = profileSelect.value;
+      profileDescription.innerText = profileInfo[prof] || "";
+      renderCriteria(prof);
+    });
+    renderCriteria(profileSelect.value);
+
+    // Max inline items before showing the “…and X more” button
+    const MAX_INLINE = 20;
+
+    // Explanations for interpreting raw HTML locations
+    const interpretationMap = {
+    "Autoplay Videos": 
+    "Each snippet is a `<video>` tag with an `autoplay` attribute. It means the video starts playing automatically—remove `autoplay` (or add controls) so users choose when playback begins.",
+
+    "Long Sentences": 
+    "Each location is a clickable text snippet showing a sentence from your page that exceeds 25 words. Clicking the sentence opens your live page at that exact spot so you can see it in context",
+
+    "H1 Missing": 
+    "No snippet here—the blank locations array signals that **no** `<h1>` was found. Your page needs at least one `<h1>` heading to define its main topic.",
+
+    "Vague Link Text": 
+    "You’ll get raw `<a>` tags whose link text is literally “click here” or “read more.” Those phrases don’t tell users where the link goes—replace them with descriptive text like “View Pricing Details.”",
+
+    "Form Fields without Labels": 
+    "Each snippet is an `<input>`, `<textarea>`, or `<select>` element with no associated `<label>`. That means screen-readers and sighted users won’t know what to enter—wrap each field in a `<label>` or use `aria-label` to provide clear labeling.",
+
+    "Time-based Content": 
+    "Raw HTML of timers, countdowns, `<marquee>`, or any element with `aria-live`. It indicates content will change after a set time without user control—provide pause/extend options or require user interaction instead of auto-updating.",
+
+    "Blinking or Marquee Tags": 
+    "You’ll see `<blink>` or `<marquee>` tags—these cause flashing or moving content that can distract or trigger seizures. Remove these tags or replace with static content.",
+
+    "Missing Captions for Media": 
+    "Snippets are `<video>` elements missing `controls`. It means users can’t turn on captions—add `controls` and ensure your video has a `<track kind=\"captions\">` or provide a transcript.",
+
+    "Missing Summary/Overview": 
+    "Each snippet is the outerHTML of an `<article>` lacking a summary/overview heading. Insert an `<h2>Overview</h2>` or a `<summary>` block before major sections.",
+
+    "Missing Nav Container": 
+    "No `<nav>` landmark was found on this page. Please wrap your primary navigation links (often in the `<header>` or immediately before your `<main>` content) in a `<nav aria-label=\"Main navigation\">…</nav>` element.",
+
+    "Too Many Nav Links": 
+    "Your primary navigation currently offers more options than most people can hold in short-term memory. Miller’s Law tells us that 5–9 items is the sweet spot—group less-important links under “More…” so you have between five and nine primaries.",
+
+    "Complex Vocabulary": 
+    "Locations are individual words plus their syllable count, e.g. “ubiquitous (4 syl)”. These words have ≥3 syllables and aren’t in the common-words whitelist. To fix replace them with simpler alternatives.",
+
+    "Accessible Font Family":
+    "In the locations list you’ll see each unique CSS 'font-family' declaration that the tool detected as resolving to a serif face, exactly as it appears in your stylesheets. For example:\n\n" +
+    "'Times New Roman, Times'\n\n" +
+    "Because there is no final 'sans-serif' fallback, the browser will fall back to a serif font. To fix each issue:\n" +
+    "1) Open your CSS and search for the exact text shown in 'locations'.\n" +
+    "2) Append a 'sans-serif' generic at the end of that declaration.\n\n" +
+   "For example:\n\n" +
+    "before: font-family: Times New Roman, Times;\n" +
+    "after: font-family: Times New Roman, Times, sans-serif;",
+
+    "Minimum Font Size": 
+    "Each snippet shows something like “14px on <p>”. That means the computed font is below 16px on that element, bump your CSS `font-size` so body text is never smaller than 16px.",
+
+    "Letter Spacing": 
+    "Snippets read like “normal on <p> (needs ≥4.2px)”. “normal” means zero extra spacing—add `letter-spacing: 0.35em` (or exact px) so letters aren’t too tight.",
+
+    "Dark Text on Light Background": 
+    "You’ll see code snippets like rgb(255, 255, 255) on <button.thumbnail_play-btn_Kf2qgjzv>. Each line shows the exact white background and the element it’s on. That example means this button has a pure-white background. To fix it, find that button in your HTML or CSS (using its tag, class or ID) and change its background to a softer off-white (for example #f5f5f5).",
+
+    "Left-Aligned Text (No Justification)": 
+    "Locations list elements whose text is `justify`. Fully-justified text can create uneven spacing—ensure those elements use `text-align: left` instead.",
+
+    "Avoid Underlines & Italics": 
+    "Each location is presented something like: “italic on ‘Find sources:…’ [<code><i></code>]”.\n\n" +
+    "It shows a short snippet of text that has been italicised (via an <code><i></code> tag or CSS) or underlined outside of a link.\n\n" +
+    "To fix each one, locate that snippet in your HTML or stylesheet and replace the italics or underline with a clear bold element (<code><strong>…</strong></code>) or a distinct colour change.\n\n",
+
+    "No Unpredictable Behavior": 
+    "Each line follows the pattern:\n\n" +
+    "Issue description: element selector “text preview”\n\n" +
+    "For example:\n\n" +
+    "Form missing submit button: <code><form#searchform.cdx-search-input></code> “Search”\n" +
+    "Hidden navigation: <code><nav.vector-appearance-landmark></code> “Appearance”\n\n" +
+    "1) Copy the selector (everything inside the <code>…</code>).\n\n" +
+    "2) Open your HTML or CSS, search for that selector.\n\n" +
+    "3) Apply the fix:\n\n" +
+    "• For missing submit buttons, add <code><button type=\"submit\">…</button></code> inside the form.\n\n" +
+    "• For hidden nav landmarks, remove <code>display: none</code> or the <code>hidden</code> attribute.\n\n" +
+    "• For autofocus, onfocus, onsubmit or assertive live regions, remove those attributes or change <code>aria-live=\"assertive\"</code> to <code>aria-live=\"polite\"</code> so updates happen only when users expect them.",
+
+    "Avoid Auto-Refreshing Content": 
+    "Locations like “Meta refresh set to 5 seconds” or “Auto-update via setTimeout(...) in inline script #3”. Provide a manual “Refresh” button or clear warning before updates occur.",
+
+    "Rapid-Flashing Content":
+    "You may see entries like: <code>div#warning (flashed 4.0×)</code>.\n\n" +
+    "Each one tells you the element’s tag and identifier plus how many full flashes it made during the one-second test.\n\n" +
+    "In this case, <code>&lt;div id=\"warning\"&gt;</code> blinked four times, which exceeds the three-times-per-second limit.\n\n" +
+    "To address it, copy that selector into your browser’s inspector, find the corresponding code, and either remove or slow down the animation so it flashes no more than three times per second."
+
+    };
+
+    document.getElementById("scan-form").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const scanUrl = document.getElementById("url").value.trim();
+      const selectedProfile = profileSelect.value;
+      if (!scanUrl) return;
+
+      // Gather only the checked tests
+      const chosenTests = Array.from(
+        criteriaFieldset.querySelectorAll("input[type=checkbox]:checked")
+      ).map(cb => cb.value);
+
+      const loading   = document.getElementById("loading");
+      const container = document.getElementById("results-container");
+      container.innerHTML = "";
+      loading.style.display = "block";
+
+      try {
+        const res = await fetch(
+          `/scan?url=${encodeURIComponent(scanUrl)}` +
+          `&profile=${encodeURIComponent(selectedProfile)}` +
+          `&tests=${encodeURIComponent(chosenTests.join(","))}`
+        );
+        if (!res.ok) throw new Error("Failed to fetch from server");
+
+        const data = await res.json();
+        loading.style.display = "none";
+        if (data.error) {
+          container.innerHTML = `<p style="color:red;" role="alert">
+            Error: ${escapeHTML(data.error)}
+          </p>`;
+          return;
+        }
+
+        // filter out any checks with zero findings
+        const results = data.filter(item => item.count > 0);
+        if (results.length === 0) {
+          container.innerHTML = `<p>No issues identified. 🎉</p>`;
+          return;
+        }
+
+        // Build the results table
+        let markup = `
+          <h2 id="results-heading"
+              style="margin-top:2rem; font-size:1.25rem; color:var(--color-text);">
+            Scan Results
+          </h2>
+          <p id="no-show-explanation"
+             style="margin-bottom:var(--spacing-sm);"><strong>Please Note: Only rules with identified issues are shown here. If a checklist item isn’t listed, it means the scan still ran, it simply found no problems for that rule.
+</strong></p>
+          <table aria-describedby="results-heading">
+            <thead>
+              <tr>
+                <th>Issue</th>
+                <th>Count</th>
+                <th>Recommendation</th>
+                <th>Issue Locations</th>
+                <th>Understanding Issue Locations</th>
+              </tr>
+            </thead>
+            <tbody>
+        `;
+
+        results.forEach(item => {
+          // Count display (with optional %)
+          let countDisplay = String(item.count);
+          if (typeof item.total === "number" && item.total > 0) {
+            const pct = ((item.count / item.total) * 100).toFixed(1);
+            countDisplay = `${item.count} of ${item.total} (${pct}%)`;
+          }
+
+          // Build Issue Locations cell
+          let locationsHTML = "N/A";
+          if (Array.isArray(item.locations) && item.locations.length) {
+
+            // Complex Vocabulary
+            if (item.issue === "Complex Vocabulary") {
+              const all = item.locations;
+              const makeLink = entry => {
+                const word = entry.replace(/\s*\(.+\)$/, "");
+                const frag = makeTextFragment(word);
+                return `<a class="example-link" href="${scanUrl}#:~:text=${frag}" target="_blank">${escapeHTML(entry)}</a>`;
+              };
+              const first = all.slice(0, MAX_INLINE).map(makeLink).join(", ");
+              const full  = all.map(makeLink).join("");
+              const more  = all.length - MAX_INLINE;
+              locationsHTML = `
+                <div class="complex-inline">
+                  ${first}
+                  ${more > 0
+                    ? `<button class="show-all" data-full="${escapeHTML(full)}">
+                         …and ${more} more
+                       </button>`
+                    : ""}
+                </div>
+              `;
+            }
+            // Long Sentences
+            else if (item.issue === "Long Sentences") {
+              const all   = item.locations;
+              const links = all.map(text => {
+                const frag = makeTextFragment(text);
+                return `<a class="example-link" href="${scanUrl}#:~:text=${frag}" target="_blank" rel="noopener noreferrer">${escapeHTML(text)}</a>`;
+              });
+              const first = links.slice(0, MAX_INLINE).join("");
+              const full  = links.join("");
+              const more  = links.length - MAX_INLINE;
+              locationsHTML = `
+                <div class="complex-inline">
+                  ${first}
+                  ${more > 0
+                    ? `<button class="show-all" data-full="${escapeHTML(full)}">
+                         …and ${more} more
+                       </button>`
+                    : ""}
+                </div>
+              `;
+            }
+            // Missing Captions for Media
+            else if (item.issue === "Missing Captions for Media") {
+              const all   = item.locations;
+              const links = all.map(html => videoLinkFromHTML(html));
+              const first = links.slice(0, MAX_INLINE).join("");
+              const full  = links.join("");
+              const more  = links.length - MAX_INLINE;
+              locationsHTML = `
+                <div class="complex-inline">
+                  ${first}
+                  ${more > 0
+                    ? `<button class="show-all" data-full="${escapeHTML(full)}">
+                         …and ${more} more
+                       </button>`
+                    : ""}
+                </div>
+              `;
+            }
+            // Autoplay Videos
+            else if (item.issue === "Autoplay Videos") {
+              const all   = item.locations;
+              const links = all.map(html => videoLinkFromHTML(html));
+              const first = links.slice(0, MAX_INLINE).join("");
+              const full  = links.join("");
+              const more  = links.length - MAX_INLINE;
+              locationsHTML = `
+                <div class="complex-inline">
+                  ${first}
+                  ${more > 0
+                    ? `<button class="show-all" data-full="${escapeHTML(full)}">
+                         …and ${more} more
+                       </button>`
+                    : ""}
+                </div>
+              `;
+            }
+            // Avoid Underlines & Italics
+            else if (item.issue.includes("Underlines") || item.issue.includes("Italics")) {
+              const all   = item.locations;
+              const first = all.slice(0, MAX_INLINE)
+                .map(loc => `<pre>${escapeHTML(loc)}</pre>`).join("");
+              const full  = all.map(loc => `<pre>${escapeHTML(loc)}</pre>`).join("");
+              const more  = all.length - MAX_INLINE;
+              locationsHTML = `
+                <div class="complex-inline">
+                  ${first}
+                  ${more > 0
+                    ? `<button class="show-all" data-full="${escapeHTML(full)}">
+                         …and ${more} more
+                       </button>`
+                    : ""}
+                </div>
+              `;
+            }
+            // Too Many Navigation Links
+            else if (item.issue.includes("Nav Links")) {
+              const all   = item.locations;
+              const first = all.slice(0, MAX_INLINE)
+                .map(loc => `<pre>${escapeHTML(loc)}</pre>`).join("");
+              const full  = all.map(loc => `<pre>${escapeHTML(loc)}</pre>`).join("");
+              const more  = all.length - MAX_INLINE;
+              locationsHTML = `
+                <div class="complex-inline">
+                  ${first}
+                  ${more > 0
+                    ? `<button class="show-all" data-full="${escapeHTML(full)}">
+                         …and ${more} more
+                       </button>`
+                    : ""}
+                </div>
+              `;
+            }
+            // Default (all other issues)
+            else {
+              const slice = item.locations.slice(0, MAX_INLINE);
+              const more  = item.locations.length - slice.length;
+              locationsHTML = slice.map(loc => `<pre>${escapeHTML(loc)}</pre>`).join("");
+              if (more > 0) {
+                locationsHTML += `
+                  <div style="margin-top:8px; font-style:italic; color:var(--color-muted);">
+                    …and ${more} more
+                  </div>`;
+              }
+            }
+          }
+
+          // How to interpret the raw locations
+          const interp = interpretationMap[item.issue] || "";
+
+          markup += `
+            <tr>
+              <td>${escapeHTML(item.issue)}</td>
+              <td>${escapeHTML(countDisplay)}</td>
+              <td class="recommendation">${item.recommendation}</td>
+              <td>${locationsHTML}</td>
+              <td style="white-space: pre-line;">${escapeHTML(interp)}</td>
+            </tr>`;
+        });
+
+        markup += `</tbody></table>`;
+        container.innerHTML = markup;
+
+        // Wire up all “…and X more” buttons
+        container.querySelectorAll("button.show-all").forEach(btn => {
+          btn.addEventListener("click", e => {
+            e.preventDefault();
+            const wrapper = btn.closest(".complex-inline");
+            wrapper.innerHTML = btn.dataset.full;
+          });
+        });
+
+      } catch (err) {
+        loading.style.display = "none";
+        container.innerHTML = `<p style="color:red;" role="alert">
+          Failed to fetch results: ${escapeHTML(err.message)}
+        </p>`;
+      }
+    });
+  </script>
+</body>
+</html>

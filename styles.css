@@ -1,0 +1,878 @@
+/* =============================================================================
+   styling for:
+     – home.html
+     – index.html (Cognitive Accessibility Evaluation)
+     – readability.html (Readability Checker)
+   ============================================================================= */
+
+/* =========================================================================
+   1. COLOR & FONT VARIABLES
+   ========================================================================= */
+:root {
+  /* Primary Palette */
+  --color-background:     #f7f9fc;   /* Very light gray-blue for page background */
+  --color-surface:        #ffffff;   /* White for cards and forms */
+  --color-primary:        #1e88e5;   /* Bright blue for header/nav and accents */
+  --color-primary-hover:  #1565c0;   /* Darker blue on hover */
+  --color-text:           #1a2930;   /* Dark slate for main text */
+  --color-muted:          #4f5b66;   /* Medium gray for secondary text */
+  --color-border:         #dde3ea;   /* Light gray for borders and inputs */
+  --color-shadow:         rgba(0, 0, 0, 0.05); /* Subtle drop shadow */
+
+  /* Font Stack */
+  --font-family-base:     -apple-system, BlinkMacSystemFont,
+                          "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* Typography */
+  --font-size-base:       14px;      /* ← reduced from 16px for overall scale */
+  --font-size-lg:         1.125rem;  /* ~18px */
+  --font-size-xl:         1.75rem;   /* ~28px */
+  --font-size-xxl:        2.25rem;   /* ~36px */
+
+  --line-height-base:     1.6;
+  --spacing-xxs:          4px;
+  --spacing-xs:           8px;
+  --spacing-sm:           12px;
+  --spacing-md:           16px;
+  --spacing-lg:           24px;
+  --spacing-xl:           32px;
+}
+
+/* =========================================================================
+   2. GLOBAL RESET & BASE STYLES
+   ----------------------------------------------------------------------------
+   Normalise margins/padding, set box-sizing, establish body defaults.
+   ========================================================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: var(--font-size-base);
+}
+
+body {
+  min-height: 100vh;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
+  line-height: var(--line-height-base);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Remove list padding for ul/ol by default; we'll re-add spacing where needed */
+ul,
+ol {
+  list-style: none;
+}
+
+/* Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--color-text);
+  line-height: 1.2;
+  margin-bottom: var(--spacing-sm);
+}
+
+h1 {
+  font-size: var(--font-size-xxl);
+}
+
+h2 {
+  font-size: var(--font-size-xl);
+}
+
+h3 {
+  font-size: var(--font-size-lg);
+}
+
+p {
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-base);
+}
+
+/* Links */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color 0.2s ease-in-out;
+}
+
+a:hover,
+a:focus {
+  color: var(--color-primary-hover);
+  outline: none;
+}
+
+/* =============================================================================
+   3. HEADER & NAVIGATION (All Pages)
+   ----------------------------------------------------------------------------
+   Full-width header with left-aligned logo/title and right-aligned nav links.
+   ============================================================================= */
+header {
+  background-color: var(--color-primary);
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px var(--color-shadow);
+}
+
+.header-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: var(--spacing-sm) var(--spacing-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+header h1 {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+header nav {
+  display: flex;
+  gap: var(--spacing-lg);
+  white-space: nowrap;
+}
+
+header nav a {
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: var(--spacing-xs) var(--spacing-lg);
+  position: relative;
+  transition: color 0.2s ease-in-out;
+}
+
+header nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: #fff;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.3s ease;
+}
+
+header nav a:hover,
+header nav a:focus {
+  color: #000000
+}
+
+header nav a:hover::after,
+header nav a:focus::after {
+  transform: scaleX(1);
+}
+
+header nav a[aria-current="page"]::after {
+  transform: scaleX(1);
+}
+
+
+/* =============================================================================
+   4. MAIN CONTENT CONTAINER
+   ----------------------------------------------------------------------------
+   Centers content, provides horizontal padding, and vertical spacing.
+   ============================================================================= */
+.container {
+  max-width: 1000px;               /* ← narrowed from 1200px */
+  margin: var(--spacing-xl) auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* =============================================================================
+   5. HOME PAGE STYLING (home.html)
+   ----------------------------------------------------------------------------
+   Distinct sections, clear headings, bulleted/numbered lists.
+   ============================================================================= */
+.home-intro h2,
+.home-features h2,
+.home-how h2,
+.home-quicklinks h2 {
+  margin-bottom: var(--spacing-sm);
+}
+
+.home-intro p,
+.home-features p,
+.home-how p,
+.home-quicklinks p {
+  margin-bottom: var(--spacing-md);
+}
+
+.home-features ul,
+.home-quicklinks ul {
+  list-style: disc inside var(--color-primary);
+  margin-left: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.home-how ol {
+  list-style: decimal inside var(--color-primary);
+  margin-left: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+footer {
+  display: none;
+}
+
+/* =============================================================================
+   6. CARD COMPONENT (index.html & readability.html)
+   ----------------------------------------------------------------------------
+   White background, rounded corners, subtle box-shadow, padding for “cards.”
+   ============================================================================= */
+.card {
+  background-color: var(--color-surface);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px var(--color-shadow);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+/* =============================================================================
+   7. FORM ELEMENTS (index.html & readability.html)
+   ----------------------------------------------------------------------------
+   Responsive form layout with styled inputs and buttons.
+   ============================================================================= */
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+form label {
+  font-weight: 500;
+  color: var(--color-text);
+}
+
+form select,
+form input[type="text"] {
+  flex: 1 1 300px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background-color: #fafbfc;
+  transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  color: var(--color-text);
+}
+
+form select:focus,
+form input[type="text"]:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(30, 136, 229, 0.2);
+}
+
+form button {
+  flex: 0 0 auto;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: #fff;
+  background-color: var(--color-primary);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+form button:hover,
+form button:focus {
+  background-color: var(--color-primary-hover);
+  outline: none;
+}
+
+form button:active {
+  transform: scale(0.97);
+}
+
+#profile-description {
+  width: 100%;
+  text-align: center;
+  margin-top: var(--spacing-xs);
+  font-size: 0.9rem;
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+/* =============================================================================
+   7.1. RULE PANEL (index.html)
+   ----------------------------------------------------------------------------
+   Styles for the custom criteria checkbox panel
+   ============================================================================= */
+#criteria-fieldset {
+  margin-top: var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: var(--spacing-md);
+  background-color: #fafbfc;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-xs) var(--spacing-md);
+  max-height: none;
+  overflow: visible;
+}
+
+#criteria-fieldset legend {
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  grid-column: 1 / -1;
+}
+
+#criteria-fieldset label {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-base);
+}
+
+#criteria-fieldset input[type="checkbox"] {
+  transform: scale(1.1);
+  accent-color: var(--color-primary);
+}
+
+/* =============================================================================
+   8. LOADING INDICATOR (index.html & readability.html)
+   ----------------------------------------------------------------------------
+   Centered, polite announcement for screen readers (aria-live).
+   ============================================================================= */
+#loading {
+  text-align: center;
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  color: var(--color-primary);
+  margin-top: var(--spacing-md);
+}
+
+/* =============================================================================
+   9. TABLE WRAPPER (new)
+   ----------------------------------------------------------------------------
+   Allow just the results region to scroll horizontally if needed
+   ============================================================================= */
+#results-container {
+  overflow-x: auto;
+  padding-bottom: var(--spacing-md);
+}
+
+/* =============================================================================
+   10. TABLE STYLING (index.html & readability.html)
+   ----------------------------------------------------------------------------
+   Rounded corners, striped rows, hover highlight, clear header background.
+   ============================================================================= */
+table {
+  /* enforce the fixed column widths below */
+  table-layout: fixed;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--spacing-lg);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px var(--color-shadow);
+}
+
+thead {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+th,
+td {
+  padding: var(--spacing-md);
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  font-weight: 600;
+  font-size: var(--font-size-base);
+}
+
+tbody tr {
+  background-color: var(--color-surface);
+  transition: background-color 0.2s ease-in-out;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #f1f6fb;
+}
+
+tbody tr:hover {
+  background-color: #e3eefb;
+}
+
+td,
+th {
+  border-bottom: 1px solid var(--color-border);
+}
+
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Let the “Recommendation” column allow \n\n breaks */
+table td:nth-child(3) {
+  white-space: pre-line;
+  word-wrap: break-word;
+}
+
+/* Preformatted code/text inside tables */
+pre {
+  margin: var(--spacing-xs) 0;
+  font-size: 0.875rem;
+  line-height: 1.3;
+  white-space: pre-wrap;
+  background-color: #f1f1f1;
+  padding: var(--spacing-xs);
+  border-radius: 4px;
+  overflow-wrap: anywhere;      /* ← force-wrap very long strings */
+  word-break: break-word;       /* ← legacy fallback */
+}
+
+/* =============================================================================
+   11. INLINE “EXAMPLE-LINK” WRAPPING
+   ----------------------------------------------------------------------------
+   Ensure any <a class="example-link">…</a> inside the table wraps cleanly.
+   ============================================================================= */
+a.example-link {
+  display: inline-block;
+  font-size: 0.875rem;
+  color: var(--color-primary-hover);
+  text-decoration: underline;
+  margin-bottom: var(--spacing-xs);
+  transition: color 0.2s ease-in-out;
+  overflow-wrap: anywhere;      /* force-wrap long URLs/snippets */
+  word-break: break-word;       /* catch-all fallback */
+}
+
+a.example-link:hover {
+  color: var(--color-primary);
+}
+
+/* =============================================================================
+   12. READABILITY PAGE STYLES (readability.html)
+   ----------------------------------------------------------------------------
+   Summary box, legend boxes, filter checkbox, and per-cell color coding.
+   ============================================================================= */
+#summary {
+  background-color: var(--color-surface);
+  padding: var(--spacing-lg);
+  border-radius: 8px;
+  margin-bottom: var(--spacing-md);
+  box-shadow: 0 2px 8px var(--color-shadow);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+}
+
+#summary:empty {
+  display: none;
+}
+
+#legend,
+#color-legend {
+  background-color: var(--color-surface);
+  padding: var(--spacing-md);
+  border-radius: 8px;
+  margin-bottom: var(--spacing-md);
+  font-size: 0.9rem;
+  color: var(--color-text);
+  box-shadow: 0 2px 8px var(--color-shadow);
+}
+
+#legend h4,
+#color-legend h4 {
+  margin-top: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+#legend dl,
+#color-legend dl {
+  margin: var(--spacing-sm) 0;
+}
+
+#legend dt,
+#color-legend dt {
+  font-weight: 600;
+  margin-top: var(--spacing-sm);
+}
+
+#legend dd,
+#color-legend dd {
+  margin: var(--spacing-xxs) 0 var(--spacing-sm) var(--spacing-md);
+  line-height: var(--line-height-base);
+}
+
+.legend-container {
+  display: flex;
+  gap: var(--spacing-lg);
+  align-items: flex-start;
+  margin-bottom: var(--spacing-md);
+}
+
+.legend-column {
+  flex: 1;
+}
+
+.legend-column h4 {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-base);
+}
+
+.legend-column dl {
+  margin: 0;
+  padding-left: var(--spacing-md);
+}
+
+.legend-column dt {
+  font-weight: 600;
+  margin-top: var(--spacing-sm);
+}
+
+.legend-column dd {
+  margin: var(--spacing-xxs) 0 var(--spacing-sm) 0 !important;
+  line-height: var(--line-height-base);
+}
+
+#filter {
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+}
+
+td.text {
+  max-width: 700px;
+}
+
+td.text p {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: var(--font-size-base);
+  line-height: 1.4;
+}
+
+/* Color-coded cells (Readability) */
+td.grade.green  { background-color: #d4edda; } /* light green */
+td.grade.amber  { background-color: #fff3cd; } /* light amber */
+td.grade.red    { background-color: #f8d7da; } /* light red */
+
+/* =============================================================================
+   12.1 READABILITY CARD LAYOUT
+   ----------------------------------------------------------------------------
+   Spacing and centered figures for the Readability Checker card
+   ============================================================================= */
+.card[aria-labelledby="readability-heading"] > p,
+.card[aria-labelledby="readability-heading"] > ul {
+  margin-bottom: var(--spacing-md);
+}
+
+.card[aria-labelledby="readability-heading"] figure {
+  text-align: center;
+  margin: var(--spacing-lg) 0;
+}
+
+.card[aria-labelledby="readability-heading"] img {
+  max-width: 100%;
+  height: auto;
+}
+
+.card[aria-labelledby="readability-heading"] figcaption {
+  margin-top: var(--spacing-xs);
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+/* =============================================================================
+   13. LEGEND DOTS (Readability)
+   ----------------------------------------------------------------------------
+   Simple colored circles that match table cell backgrounds.
+   ============================================================================= */
+.legend-dot {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border-radius: 50%;
+  margin-right: var(--spacing-xs);
+  vertical-align: middle;
+}
+
+/* four completely separate colours */
+.legend-dot.green     { background-color: #d4edda; } /* 90–100 = Very easy */
+.legend-dot.standard  { background-color: #cfe2f3; } /* 60–89  = Standard  */
+.legend-dot.amber     { background-color: #fff3cd; } /* 30–59  = Difficult  */
+.legend-dot.red       { background-color: #f8d7da; } /* 0–29   = Very confusing */
+
+/* =============================================================================
+   13a) Color-coded cells (Readability)
+   ============================================================================= */
+/* Estimated Level column */
+td.grade.green     { background-color: #d4edda; }
+td.grade.standard  { background-color: #cfe2f3; }
+td.grade.amber     { background-color: #fff3cd; }
+td.grade.red       { background-color: #f8d7da; }
+
+/* Reading Ease column */
+td.ease.green      { background-color: #d4edda; }
+td.ease.standard   { background-color: #cfe2f3; }
+td.ease.amber      { background-color: #fff3cd; }
+td.ease.red        { background-color: #f8d7da; }
+
+
+
+/* =============================================================================
+   14. TOOLTIP STYLING (Readability)
+   ----------------------------------------------------------------------------
+   Hover “?” icons reveal explanations in a small dark bubble.
+   ============================================================================= */
+.tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: help;
+  margin-left: var(--spacing-xs);
+  color: var(--color-muted);
+  font-weight: 600;
+}
+
+.tooltip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-text);
+  color: #fff;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+  font-size: 0.75rem;
+  z-index: 10;
+}
+
+.tooltip:hover::after {
+  opacity: 1;
+}
+
+/* =============================================================================
+   15. BULLET OVERRIDE FOR CARD LISTS
+   ----------------------------------------------------------------------------
+   Restore default bullets inside .card elements.
+   ============================================================================= */
+.card ul {
+  list-style: disc inside var(--color-primary);
+  margin-left: var(--spacing-md);
+}
+
+.card ol {
+  list-style: decimal inside var(--color-primary);
+  margin-left: var(--spacing-md);
+}
+
+/* =============================================================================
+   15.1 KEY FEATURES LIST SPACING
+   ----------------------------------------------------------------------------
+   Add breathing room between items in the Key Features list.
+   ============================================================================= */
+#features-heading + ul {
+  line-height: 1.6;
+  padding-top: var(--spacing-sm);
+}
+
+#features-heading + ul li {
+  margin-bottom: var(--spacing-md);
+}
+
+#features-heading + ul li:last-child {
+  margin-bottom: 0;
+}
+
+/* =============================================================================
+   15.2 GETTING STARTED LIST STYLING
+   ----------------------------------------------------------------------------
+   Improve spacing and readability of the Getting Started steps
+   ============================================================================= */
+.card[aria-labelledby="getting-started-heading"] ol {
+  margin-top: var(--spacing-md);
+  padding-left: var(--spacing-lg);
+  line-height: var(--line-height-base);
+}
+
+.card[aria-labelledby="getting-started-heading"] li {
+  margin-bottom: var(--spacing-md);
+}
+
+.card[aria-labelledby="getting-started-heading"] li:last-child {
+  margin-bottom: 0;
+}
+
+/* =============================================================================
+   16. MOBILE RESPONSIVENESS
+   ----------------------------------------------------------------------------
+   Adjust layout for screens under 600px wide.
+   ============================================================================= */
+@media (max-width: 600px) {
+  .header-container {
+    flex-direction: column;
+    text-align: center;
+    gap: var(--spacing-sm);
+  }
+
+  header h1 {
+    font-size: var(--font-size-lg);
+    white-space: normal;
+  }
+
+  header nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  form label {
+    margin-bottom: var(--spacing-xs);
+  }
+
+  form select,
+  form input[type="text"],
+  form button {
+    width: 100%;
+  }
+
+  #criteria-fieldset {
+    grid-template-columns: 1fr;
+  }
+
+  #profile-description {
+    text-align: left;
+    margin-left: var(--spacing-sm);
+  }
+
+  .container {
+    margin: var(--spacing-lg) auto;
+    padding: 0 var(--spacing-sm);
+  }
+}
+
+/* =============================================================================
+   17. INLINE “SEE ALL” BUTTON
+   ----------------------------------------------------------------------------
+   For any “…and X more” buttons styled as links.
+   ============================================================================= */
+button.show-all {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-primary);
+  text-decoration: underline;
+  font: inherit;
+  cursor: pointer;
+}
+
+button.show-all:hover,
+button.show-all:focus {
+  color: var(--color-primary-hover);
+  outline: none;
+}
+
+/* =============================================================================
+   18. WIDEN RECOMMENDATION & ISSUE-LOCATIONS COLUMNS
+   ----------------------------------------------------------------------------
+   Give more room to those two columns for readability.
+   ============================================================================= */
+/* Issue column (Issue name) */
+th:nth-child(1),
+td:nth-child(1) {
+  width: 12%;
+}
+
+/* Count column */
+th:nth-child(2),
+td:nth-child(2) {
+  width: 8%;
+}
+
+/* Recommendation column */
+th:nth-child(3),
+td:nth-child(3) {
+  width: 30%;
+}
+
+/* Issue Locations column */
+th:nth-child(4),
+td:nth-child(4) {
+  width: 30%;
+}
+
+th:nth-child(5),
+td:nth-child(5) {
+  width: 20%;
+  white-space: normal;
+}
+
+/* =============================================================================
+   18. READABILITY-CHECKER TABLE COLUMN WIDTHS
+   ----------------------------------------------------------------------------
+   Scoped to #readability-results-container only.
+   ============================================================================= */
+#readability-results-container table {
+  table-layout: fixed;
+  width: 100%;
+}
+#readability-results-container table th:nth-child(1),
+#readability-results-container table td:nth-child(1) {
+  width: 65%;
+}
+
+#readability-results-container table th:nth-child(2),
+#readability-results-container table td:nth-child(2) {
+  width: 25%;
+}
+
+#readability-results-container table th:nth-child(3),
+#readability-results-container table td:nth-child(3) {
+  width: 10%;
+}
+
+/* =============================================================================
+   19. LET READABILITY TOOLTIP BUBBLES ESCAPE
+   ============================================================================= */
+#readability-results-container table {
+  overflow: visible; /* allow pop-ups to escape */
+}
+
+#readability-results-container th,
+#readability-results-container td {
+  overflow: visible;
+}
+
+/* bump the z-index so the bubble sits on top */
+#readability-results-container .tooltip::after {
+  z-index: 2000;
+}

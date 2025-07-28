@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Readability Checker</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="header-container">
+      <h1>Readability Checker</h1>
+      <nav aria-label="Main Navigation">
+        <a href="home.html">Home</a>
+        <a href="index.html">Cognitive Accessibility Evaluation</a>
+        <a href="readability.html" aria-current="page">Readability Checker</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" role="main">
+    <div class="card" aria-labelledby="readability-form-heading">
+      <h2 id="readability-form-heading"
+          style="margin-bottom:1rem; font-size:1.25rem; color:var(--color-text);">
+        Enter a URL to Check Readability
+      </h2>
+
+      <form id="readability-form">
+        <label for="url" class="visually-hidden">Website URL</label>
+        <input
+          type="text"
+          id="url"
+          placeholder="Enter website URL"
+          aria-required="true"
+          required
+        />
+        <button type="submit">Check Readability</button>
+      </form>
+
+      <div id="loading" style="display: none;" aria-live="polite">
+        🔍 Checking readability, please wait...
+      </div>
+
+      <div id="summary"></div>
+
+      <div id="legend" class="legend-container">
+  <!-- Left column: Reading Ease -->
+  <div class="legend-column">
+    <h4>Reading Ease <small>(0–100; higher = easier)</small></h4>
+    <dl>
+      <dd>• 90–100 = Very easy</dd>
+      <dd>• 60–89  = Standard</dd>
+      <dd>• 30–59  = Difficult</dd>
+      <dd>• 0–29   = Very confusing</dd>
+    </dl>
+  </div>
+
+  <!-- Right column: Estimated Level -->
+  <div class="legend-column">
+    <h4>Estimated Level</h4>
+    <dl>
+      <dd>• Primary School (up to 11 years)</dd>
+      <dd>• Secondary School (12–16 years)</dd>
+      <dd>• Sixth Form / A-Levels (17–18 years)</dd>
+      <dd>• Graduate / Adult (19 years and above)</dd>
+    </dl>
+  </div>
+</div>
+
+
+      <div id="color-legend">
+        <h4>What the Table Colours Mean</h4>
+        <dl>
+          <dt><span class="legend-dot green"></span>Very easy / Primary School</dt>
+          <dd>Text is extremely easy (90–100) or target up to age 11.</dd>
+
+          <dt><span class="legend-dot standard"></span>Standard / Secondary School</dt>
+          <dd>Text is standard (60–89) or target ages 12–16.</dd>
+
+          <dt><span class="legend-dot amber"></span>Difficult / Sixth Form</dt>
+          <dd>Text is difficult (30–59) or target ages 17–18.</dd>
+
+          <dt><span class="legend-dot red"></span>Very confusing / Graduate</dt>
+          <dd>Text is very confusing (0–29) or target age 19+.</dd>
+        </dl>
+      </div>
+
+      <div id="filter">
+        <label>
+          <input type="checkbox" id="show-problems-only" />
+          Show only paragraphs classified as problems
+        </label>
+      </div>
+    </div>
+
+    <div
+      id="readability-results-container"
+      role="region"
+      aria-labelledby="readability-results-heading"
+    >
+      <!-- Results table will be injected here -->
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("readability-form");
+    const loading = document.getElementById("loading");
+    const summaryEl = document.getElementById("summary");
+    const filterCb = document.getElementById("show-problems-only");
+    const results = document.getElementById("readability-results-container");
+    const colorLegend = document.getElementById("color-legend");
+
+    let allBlocks = [];
+    let sourceUrl = "";
+
+    function escapeHTML(str) {
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function mapReadingAgeToLevel(age) {
+      if (age <= 11)  return { label: "Primary School",       range: "up to 11 years"   };
+      if (age <= 16)  return { label: "Secondary School",      range: "12 to 16 years"   };
+      if (age <= 18)  return { label: "Sixth Form / A-Levels", range: "17 to 18 years"   };
+      return            { label: "Graduate / Adult",       range: "19 years and above" };
+    }
+
+    function makeTextFragment(text) {
+      const words = text.trim().split(/\s+/);
+      return encodeURIComponent(words.slice(0, 5).join(" "));
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      sourceUrl = document.getElementById("url").value.trim();
+      if (!sourceUrl) return;
+
+      loading.style.display = "block";
+      summaryEl.innerHTML = "";
+      results.innerHTML = "";
+      colorLegend.style.display = "none";
+
+      try {
+        const res = await fetch(`/readability?url=${encodeURIComponent(sourceUrl)}`);
+        const data = await res.json();
+        loading.style.display = "none";
+
+        if (!res.ok || data.error) {
+          summaryEl.innerHTML = `<p style="color:red;" role="alert">
+            Error: ${escapeHTML(data.error || res.statusText)}
+          </p>`;
+          return;
+        }
+
+        allBlocks = data.blocks.filter(b =>
+          b.text.trim().split(/\s+/).length >= 5
+        );
+
+        renderSummary(data.overall, allBlocks);
+        renderTable();
+      } catch (err) {
+        loading.style.display = "none";
+        summaryEl.innerHTML = `<p style="color:red;" role="alert">
+          Fetch error: ${escapeHTML(err.message)}
+        </p>`;
+      }
+    });
+
+    filterCb.addEventListener("change", renderTable);
+
+    function renderSummary(overall, blocks) {
+      const numAge = Math.round(overall.gradeLevel + 5);
+      const lvl = mapReadingAgeToLevel(numAge);
+
+      let ease = Math.min(100, overall.readingEase);
+      if (ease < 20) ease = 20;
+
+      const problemCount = blocks.filter(
+        b => (b.gradeLevel + 5) > 13 || b.readingEase < 30
+      ).length;
+
+      summaryEl.innerHTML = `
+        <div><strong>Estimated Level:</strong> ${lvl.label} (${lvl.range})</div>
+        <div><strong>Overall Reading Ease:</strong> ${ease.toFixed(2)}</div>
+        <div><strong>Problem paragraphs:</strong> ${problemCount}</div>
+      `;
+    }
+
+    function renderTable() {
+      const showOnly = filterCb.checked;
+      const toShow = showOnly
+        ? allBlocks.filter(b => (b.gradeLevel + 5) > 13 || b.readingEase < 30)
+        : allBlocks;
+
+      if (!toShow.length) {
+        results.innerHTML = "<p>No paragraphs to display.</p>";
+        return;
+      }
+
+      let html = `
+        <h2 id="readability-results-heading"
+            style="margin-top:2rem; font-size:1.25rem; color:var(--color-text);">
+          Readability Results
+        </h2>
+        <table aria-describedby="readability-results-heading">
+          <thead>
+            <tr>
+              <th>Paragraph</th>
+              <th>
+                Estimated Level
+                <span class="tooltip" data-tip="Mapped educational stage">?</span>
+              </th>
+              <th>
+                Reading Ease
+                <span class="tooltip" data-tip="0 to 100 scale; higher = easier">?</span>
+              </th>
+            </tr>
+          </thead>
+          <tbody>`;
+
+      toShow.forEach(b => {
+        const age = Math.round(b.gradeLevel + 5);
+        const lvl = mapReadingAgeToLevel(age);
+        const ageClass =
+               age <= 11 ? "green"
+             : age <= 16 ? "standard"
+             : age <= 18 ? "amber"
+             :             "red";
+
+        let dEase = Math.min(100, b.readingEase);
+        if (dEase < 20) dEase = 20;
+        const easeClass =
+               dEase >= 90 ? "green"
+             : dEase >= 60 ? "standard"
+             : dEase >= 30 ? "amber"
+             :               "red";
+
+        const frag = makeTextFragment(b.text);
+        const link = `${sourceUrl}#:~:text=${frag}`;
+
+        html += `
+          <tr>
+            <td class="text">
+              <a href="${link}" target="_blank" rel="noopener noreferrer">
+                ${escapeHTML(b.text)}
+              </a>
+            </td>
+            <td class="grade ${ageClass}">
+              ${lvl.label} (${lvl.range})
+            </td>
+            <td class="ease ${easeClass}">
+              ${dEase.toFixed(2)}
+            </td>
+          </tr>`;
+      });
+
+      html += `</tbody></table>`;
+      results.innerHTML = html;
+      colorLegend.style.display = "block";
+    }
+  </script>
+</body>
+</html>
