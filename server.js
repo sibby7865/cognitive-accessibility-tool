@@ -3,12 +3,13 @@
 // Node.js + Express back-end to serve two endpoints:
 //   1. GET /scan        → Runs Puppeteer-based accessibility checks
 //   2. GET /readability  → Runs Puppeteer + text-readability analysis
-// Also serves static files (index.html, readability.html, styles.css).
+// Also serves static files (index.html, readability.html, styles.css, etc.).
 // Uses a persistent Puppeteer instance (sharedBrowser) for better performance.
 // =============================================================================
 
 const express   = require("express");
 const puppeteer = require("puppeteer");
+require("dotenv").config();
 const cors      = require("cors");
 const path      = require("path");
 
@@ -22,7 +23,7 @@ if (readability && readability.default) readability = readability.default;
 
 const app = express();
 
-// Allow CORS and JSON parsing (although we only return JSON from our endpoints)
+// Allow CORS and JSON parsing
 app.use(cors());
 app.use(express.json());
 
@@ -37,38 +38,20 @@ let sharedBrowser = null;
 // Helper to get (or launch) a single Puppeteer Browser
 async function getBrowser() {
   if (!sharedBrowser) {
-    // sharedBrowser = await puppeteer.launch({
-    //   headless: true,
-    //   args: ["--no-sandbox", "--disable-setuid-sandbox"]
-    // });
-//     sharedBrowser = await puppeteer.launch({
-//   headless: true,
-//   executablePath: "/usr/bin/chromium",
-//   args: [
-//     "--no-sandbox",
-//     "--disable-setuid-sandbox",
-//     // reduce memory usage:
-//     "--disable-dev-shm-usage"
-//   ]
-// });
-
-// sharedBrowser = await puppeteer.launch({
-//   headless: true,
-//   executablePath: "/usr/bin/chromium-browser",
-//   args: [
-//     "--no-sandbox",
-//     "--disable-setuid-sandbox",
-//     "--disable-dev-shm-usage"
-//   ]
-// });
-
-sharedBrowser = await puppeteer.launch({
-  headless: true,
-  args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"],
-});
-
-
-
+    const isProd = process.env.NODE_ENV === "production";
+    sharedBrowser = await puppeteer.launch({
+      headless: true,
+      executablePath: isProd
+        ? process.env.PUPPETEER_EXECUTABLE_PATH
+        : puppeteer.executablePath(),
+      args: [
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+        "--disable-dev-shm-usage",
+        "--single-process",
+        "--no-zygote",
+      ],
+    });
   }
   return sharedBrowser;
 }
@@ -98,8 +81,8 @@ app.get("/readability.html", (req, res) => {
 
 // -----------------------------------------------------------------------------
 // GET /scan
-// Runs Puppeteer to open the provided URL, evaluates only the rules specified
-// by either the `tests` parameter or the chosen profile, and returns a JSON report.
+// Runs Puppeteer to open the provided URL, evaluates specified rules,
+// and returns a JSON report.
 // -----------------------------------------------------------------------------
 app.get("/scan", async (req, res) => {
   const { url, profile = "general", tests } = req.query;
@@ -107,7 +90,6 @@ app.get("/scan", async (req, res) => {
     return res.status(400).json({ error: "URL is required" });
   }
 
-  // If tests param provided, use those IDs; otherwise fallback to profile mapping
   let ruleIds;
   if (typeof tests === "string" && tests.trim()) {
     ruleIds = tests.split(",").map(id => id.trim()).filter(Boolean);
@@ -115,7 +97,6 @@ app.get("/scan", async (req, res) => {
     ruleIds = profiles[profile] || profiles.general;
   }
 
-  // Build an array of rule objects from allRules, filtering out any unknown IDs
   const rulesToRun = ruleIds
     .map(id => {
       if (!allRules[id]) {
@@ -131,18 +112,15 @@ app.get("/scan", async (req, res) => {
     browser = await getBrowser();
     page = await browser.newPage();
 
-    // Prevent any client-side navigation (assign/replace/reload)
+    // Prevent any client-side navigation
     await page.evaluateOnNewDocument(() => {
       ["assign", "replace", "reload"].forEach(m => {
         if (window.location[m]) window.location[m] = () => {};
       });
     });
 
-    // Navigate only until DOM ready, then stop all loading
-    await page.goto(url, {
-      waitUntil: "domcontentloaded",
-      timeout: 30000
-    });
+    // Navigate until DOM ready, then stop all loading
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
     await page.evaluate(() => window.stop());
 
     // Build code string to run in page context
@@ -154,7 +132,6 @@ app.get("/scan", async (req, res) => {
           if (typeof total === 'number') o.total = total;
           out.push(o);
         }
-
         ${rulesToRun
           .map(rule => `
             // --- Rule: ${rule.id} ---
@@ -188,8 +165,8 @@ app.get("/scan", async (req, res) => {
 
 // -----------------------------------------------------------------------------
 // GET /readability
-// Runs Puppeteer to grab main paragraphs, then calculates Flesch-Kincaid grade
-// level and reading ease (overall + per-paragraph). Returns JSON.
+// Runs Puppeteer to grab paragraphs, calculates readability scores,
+// and returns JSON.
 // -----------------------------------------------------------------------------
 app.get("/readability", async (req, res) => {
   const { url } = req.query;
@@ -202,14 +179,9 @@ app.get("/readability", async (req, res) => {
     browser = await getBrowser();
     page = await browser.newPage();
 
-    // Navigate until DOM ready and stop loading
-    await page.goto(url, {
-      waitUntil: "domcontentloaded",
-      timeout: 30000
-    });
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 30000 });
     await page.evaluate(() => window.stop());
 
-    // Grab paragraphs
     const paragraphs = await page.evaluate(() => {
       const root =
         document.querySelector("article") ||
@@ -223,12 +195,10 @@ app.get("/readability", async (req, res) => {
 
     await page.close();
 
-    // Overall readability
     const textContent = paragraphs.join("\n\n");
     const overallGrade = readability.fleschKincaidGrade(textContent);
     const overallEase  = readability.fleschReadingEase(textContent);
 
-    // Per-paragraph breakdown
     const blocks = paragraphs.map(text => ({
       text,
       gradeLevel: readability.fleschKincaidGrade(text),
@@ -249,9 +219,7 @@ app.get("/readability", async (req, res) => {
 });
 
 // -----------------------------------------------------------------------------
-// Start the server on port 3000
+// Start the server
 // -----------------------------------------------------------------------------
-
 const port = process.env.PORT || 3000;
 app.listen(port, () => console.log(`Server running on port ${port}`));
-
