@@ -110,6 +110,8 @@ app.get("/scan", async (req, res) => {
   try {
     browser = await getBrowser();
     page = await browser.newPage();
+    page.setDefaultNavigationTimeout(0);
+
 
     // Prevent client-side navigation
     await page.evaluateOnNewDocument(() => {
@@ -121,7 +123,7 @@ app.get("/scan", async (req, res) => {
     // Navigate until DOM ready, then stop loading
     await page.goto(url, {
       waitUntil: "domcontentloaded",
-      timeout: 30000
+      timeout: 0
     });
     await page.evaluate(() => window.stop());
 
@@ -179,10 +181,12 @@ app.get("/readability", async (req, res) => {
   try {
     browser = await getBrowser();
     page = await browser.newPage();
+    page.setDefaultNavigationTimeout(0);
+
 
     await page.goto(url, {
       waitUntil: "domcontentloaded",
-      timeout: 30000
+      timeout: 0
     });
     await page.evaluate(() => window.stop());
 
