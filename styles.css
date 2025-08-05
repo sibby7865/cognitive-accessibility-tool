@@ -374,15 +374,41 @@ form button:active {
 /* =============================================================================
    8. LOADING INDICATOR (index.html & readability.html)
    ----------------------------------------------------------------------------
-   Centered, polite announcement for screen readers (aria-live).
+   Centered, polite announcement for screen readers (aria-live),
+   with inline spinner and concise messaging.
    ============================================================================= */
 #loading {
+  display: none;
   text-align: center;
   font-weight: 600;
   font-size: var(--font-size-base);
   color: var(--color-primary);
   margin-top: var(--spacing-md);
+  line-height: 1.4;
 }
+
+.loader {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  border: 2px solid transparent;
+  border-top-color: var(--color-primary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  vertical-align: middle;
+  margin-right: 0.5ch;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+#loading strong {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: var(--spacing-xs);
+}
+
 
 /* =============================================================================
    9. TABLE WRAPPER (new)

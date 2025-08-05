@@ -43,10 +43,12 @@
         />
         <button type="submit">Check Readability</button>
       </form>
-
-      <div id="loading" style="display: none;" aria-live="polite">
-        🔍 Checking readability, please wait...
-      </div>
+    <div id="loading" aria-live="polite">
+     <span class="loader" aria-hidden="true"></span>
+     <strong>Analyzing readability…</strong>
+  <br>
+    This may take up to 60 seconds on longer pages.
+  </div>
 
       <div id="summary"></div>
 
