@@ -234,6 +234,18 @@ footer {
   display: none;
 }
 
+.hero {
+  text-align: center;
+  margin: var(--spacing-xl) 0;      
+}
+
+.hero img {
+  max-width: 100%;                 
+  width: 300px;                    
+  height: auto;
+  display: inline-block;           
+}
+
 /* =============================================================================
    6. CARD COMPONENT (index.html & readability.html)
    ----------------------------------------------------------------------------
