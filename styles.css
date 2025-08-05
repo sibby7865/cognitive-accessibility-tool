@@ -246,6 +246,12 @@ footer {
   display: inline-block;           
 }
 
+/* force all cards inside hero to left-align their text */
+.hero .card {
+  text-align: left;
+}
+
+
 /* =============================================================================
    6. CARD COMPONENT (index.html & readability.html)
    ----------------------------------------------------------------------------
@@ -593,7 +599,7 @@ td.grade.red    { background-color: #f8d7da; } /* light red */
 /* =============================================================================
    12.1 READABILITY CARD LAYOUT
    ----------------------------------------------------------------------------
-   Spacing and centered figures for the Readability Checker card
+   Adjusted size and centered formula diagrams in the Readability Checker card
    ============================================================================= */
 .card[aria-labelledby="readability-heading"] > p,
 .card[aria-labelledby="readability-heading"] > ul {
@@ -603,11 +609,15 @@ td.grade.red    { background-color: #f8d7da; } /* light red */
 .card[aria-labelledby="readability-heading"] figure {
   text-align: center;
   margin: var(--spacing-lg) 0;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.card[aria-labelledby="readability-heading"] img {
-  max-width: 100%;
+.card[aria-labelledby="readability-heading"] figure img {
+  width: 100%;
   height: auto;
+  display: block;
 }
 
 .card[aria-labelledby="readability-heading"] figcaption {
@@ -615,6 +625,8 @@ td.grade.red    { background-color: #f8d7da; } /* light red */
   font-size: 0.9rem;
   color: var(--color-muted);
 }
+
+
 /* =============================================================================
    13. LEGEND DOTS (Readability)
    ----------------------------------------------------------------------------
