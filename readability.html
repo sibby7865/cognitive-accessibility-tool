@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Readability Checker</title>
   <link rel="stylesheet" href="styles.css" />
-   <!-- Favicon -->
+  <!-- Favicon -->
   <link
     rel="icon"
     type="image/png"
@@ -43,41 +43,41 @@
         />
         <button type="submit">Check Readability</button>
       </form>
-    <div id="loading" aria-live="polite">
-     <span class="loader" aria-hidden="true"></span>
-     <strong>Analyzing readability…</strong>
-  <br>
-    This may take up to 60 seconds on longer pages.
-  </div>
+
+      <!-- loading hidden by default -->
+      <div id="loading" aria-live="polite" style="display: none;">
+        <span class="loader" aria-hidden="true"></span>
+        <strong>Analyzing readability…</strong><br>
+        This may take up to 60 seconds on longer pages.
+      </div>
 
       <div id="summary"></div>
 
       <div id="legend" class="legend-container">
-  <!-- Left column: Reading Ease -->
-  <div class="legend-column">
-    <h4>Reading Ease <small>(0–100; higher = easier)</small></h4>
-    <dl>
-      <dd>• 90–100 = Very easy</dd>
-      <dd>• 60–89  = Standard</dd>
-      <dd>• 30–59  = Difficult</dd>
-      <dd>• 0–29   = Very confusing</dd>
-    </dl>
-  </div>
+        <!-- Left column: Reading Ease -->
+        <div class="legend-column">
+          <h4>Reading Ease <small>(0–100; higher = easier)</small></h4>
+          <dl>
+            <dd>• 90–100 = Very easy</dd>
+            <dd>• 60–89  = Standard</dd>
+            <dd>• 30–59  = Difficult</dd>
+            <dd>• 0–29   = Very confusing</dd>
+          </dl>
+        </div>
+        <!-- Right column: Estimated Level -->
+        <div class="legend-column">
+          <h4>Estimated Level</h4>
+          <dl>
+            <dd>• Primary School (up to 11 years)</dd>
+            <dd>• Secondary School (12–16 years)</dd>
+            <dd>• Sixth Form / A-Levels (17–18 years)</dd>
+            <dd>• Graduate / Adult (19 years and above)</dd>
+          </dl>
+        </div>
+      </div>
 
-  <!-- Right column: Estimated Level -->
-  <div class="legend-column">
-    <h4>Estimated Level</h4>
-    <dl>
-      <dd>• Primary School (up to 11 years)</dd>
-      <dd>• Secondary School (12–16 years)</dd>
-      <dd>• Sixth Form / A-Levels (17–18 years)</dd>
-      <dd>• Graduate / Adult (19 years and above)</dd>
-    </dl>
-  </div>
-</div>
-
-
-      <div id="color-legend">
+      <!-- color-legend & filter hidden until results -->
+      <div id="color-legend" style="display: none;">
         <h4>What the Table Colours Mean</h4>
         <dl>
           <dt><span class="legend-dot green"></span>Very easy / Primary School</dt>
@@ -94,7 +94,7 @@
         </dl>
       </div>
 
-      <div id="filter">
+      <div id="filter" style="display: none;">
         <label>
           <input type="checkbox" id="show-problems-only" />
           Show only paragraphs classified as problems
@@ -112,12 +112,13 @@
   </main>
 
   <script>
-    const form = document.getElementById("readability-form");
-    const loading = document.getElementById("loading");
-    const summaryEl = document.getElementById("summary");
-    const filterCb = document.getElementById("show-problems-only");
-    const results = document.getElementById("readability-results-container");
+    const form        = document.getElementById("readability-form");
+    const loading     = document.getElementById("loading");
+    const summaryEl   = document.getElementById("summary");
+    const filterCb    = document.getElementById("show-problems-only");
+    const results     = document.getElementById("readability-results-container");
     const colorLegend = document.getElementById("color-legend");
+    const filterDiv   = document.getElementById("filter");
 
     let allBlocks = [];
     let sourceUrl = "";
@@ -148,13 +149,17 @@
       sourceUrl = document.getElementById("url").value.trim();
       if (!sourceUrl) return;
 
-      loading.style.display = "block";
-      summaryEl.innerHTML = "";
-      results.innerHTML = "";
+      // show loading
+      loading.style.display   = "block";
+      summaryEl.innerHTML     = "";
+      results.innerHTML       = "";
+
+      // hide legends & filter
       colorLegend.style.display = "none";
+      filterDiv.style.display   = "none";
 
       try {
-        const res = await fetch(`/readability?url=${encodeURIComponent(sourceUrl)}`);
+        const res  = await fetch(`/readability?url=${encodeURIComponent(sourceUrl)}`);
         const data = await res.json();
         loading.style.display = "none";
 
@@ -183,7 +188,7 @@
 
     function renderSummary(overall, blocks) {
       const numAge = Math.round(overall.gradeLevel + 5);
-      const lvl = mapReadingAgeToLevel(numAge);
+      const lvl    = mapReadingAgeToLevel(numAge);
 
       let ease = Math.min(100, overall.readingEase);
       if (ease < 20) ease = 20;
@@ -201,7 +206,7 @@
 
     function renderTable() {
       const showOnly = filterCb.checked;
-      const toShow = showOnly
+      const toShow   = showOnly
         ? allBlocks.filter(b => (b.gradeLevel + 5) > 13 || b.readingEase < 30)
         : allBlocks;
 
@@ -232,13 +237,11 @@
           <tbody>`;
 
       toShow.forEach(b => {
-        const age = Math.round(b.gradeLevel + 5);
-        const lvl = mapReadingAgeToLevel(age);
         const ageClass =
-               age <= 11 ? "green"
-             : age <= 16 ? "standard"
-             : age <= 18 ? "amber"
-             :             "red";
+               b.gradeLevel + 5 <= 11 ? "green"
+             : b.gradeLevel + 5 <= 16 ? "standard"
+             : b.gradeLevel + 5 <= 18 ? "amber"
+             :                          "red";
 
         let dEase = Math.min(100, b.readingEase);
         if (dEase < 20) dEase = 20;
@@ -259,7 +262,7 @@
               </a>
             </td>
             <td class="grade ${ageClass}">
-              ${lvl.label} (${lvl.range})
+              ${mapReadingAgeToLevel(Math.round(b.gradeLevel + 5)).label}
             </td>
             <td class="ease ${easeClass}">
               ${dEase.toFixed(2)}
@@ -269,7 +272,10 @@
 
       html += `</tbody></table>`;
       results.innerHTML = html;
+
+      // show color legend & filter now that we have results
       colorLegend.style.display = "block";
+      filterDiv.style.display   = "block";
     }
   </script>
 </body>

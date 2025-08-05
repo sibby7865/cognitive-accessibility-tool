@@ -409,7 +409,10 @@ form button:active {
   margin-bottom: var(--spacing-xs);
 }
 
-
+#color-legend,
+#filter {
+  display: none;
+}
 /* =============================================================================
    9. TABLE WRAPPER (new)
    ----------------------------------------------------------------------------
@@ -669,7 +672,7 @@ td.grade.red    { background-color: #f8d7da; } /* light red */
 
 /* four completely separate colours */
 .legend-dot.green     { background-color: #d4edda; } /* 90–100 = Very easy */
-.legend-dot.standard  { background-color: #cfe2f3; } /* 60–89  = Standard  */
+.legend-dot.standard  { background-color: #e2e3e5; } /* 60–89  = Standard  */
 .legend-dot.amber     { background-color: #fff3cd; } /* 30–59  = Difficult  */
 .legend-dot.red       { background-color: #f8d7da; } /* 0–29   = Very confusing */
 
@@ -678,13 +681,13 @@ td.grade.red    { background-color: #f8d7da; } /* light red */
    ============================================================================= */
 /* Estimated Level column */
 td.grade.green     { background-color: #d4edda; }
-td.grade.standard  { background-color: #cfe2f3; }
+td.grade.standard  { background-color: #e2e3e5; }
 td.grade.amber     { background-color: #fff3cd; }
 td.grade.red       { background-color: #f8d7da; }
 
 /* Reading Ease column */
 td.ease.green      { background-color: #d4edda; }
-td.ease.standard   { background-color: #cfe2f3; }
+td.ease.standard   { background-color: #e2e3e5; }
 td.ease.amber      { background-color: #fff3cd; }
 td.ease.red        { background-color: #f8d7da; }
 
