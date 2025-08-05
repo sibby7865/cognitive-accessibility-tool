@@ -44,13 +44,6 @@ Disable autoplay by default. Require explicit user action (click or tap) to star
    target="_blank" rel="noopener">
   Does WCAG ‘Pause, Stop, Hide’ Apply to Simple Animations?
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-&lt;video controls preload="metadata"&gt;
-  &lt;source src="promo.mp4" type="video/mp4"&gt;
-&lt;/video&gt;
-</code></pre>
 `.trim(),
   check: `() => {
     // catches both markup-based and script-enabled autoplay
@@ -80,16 +73,6 @@ Plain Language (Tips)
 <a href="https://insidegovuk.blog.gov.uk/2014/08/04/sentence-length-why-25-words-is-our-limit/" target="_blank" rel="noopener">
 Why 25 Words Per Sentence?
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-&lt;!-- before --&gt;
-&lt;p&gt;The quarterly report, which was assembled over several weeks by our finance, marketing, and operations teams, reveals both encouraging trends as well as areas of concern that require immediate action.&lt;/p&gt;
-
-&lt;!-- after --&gt;
-&lt;p&gt;Our quarterly report was assembled over several weeks by finance, marketing, and operations.&lt;/p&gt;
-&lt;p&gt;It reveals encouraging trends and areas of concern that need immediate action.&lt;/p&gt;
-</code></pre>
 `.trim(),
     check: `() => {
       const sentences = [];
@@ -130,9 +113,6 @@ How to Meet WCAG 2.4.6?
 <a href="https://www.a11yproject.com/posts/how-to-accessible-heading-structure/" target="_blank" rel="noopener">
 Accessible Heading Structure
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>&lt;header&gt;&lt;h1&gt;Our Product Roadmap&lt;/h1&gt;&lt;/header&gt;</code></pre>
 `.trim(),
     check: `() => {
       const h1Count = document.querySelectorAll("h1").length;
@@ -166,15 +146,6 @@ How to meet WCAG 2.4.4: Link Purpose (In Context)?
 <a href="https://accessibility.education.gov.uk/knowledge-hub/common-issues/links" target="_blank" rel="noopener">
 Non-Descriptive Links
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-&lt;!-- before --&gt;
-&lt;a href="/report.pdf"&gt;Click here&lt;/a&gt;
-
-&lt;!-- after --&gt;
-&lt;a href="/report.pdf"&gt;Download the 2024 Annual Report (PDF)&lt;/a&gt;
-</code></pre>
 `.trim(),
     check: `() => {
       const vagueLinks = Array.from(document.querySelectorAll("a"))
@@ -224,22 +195,6 @@ Understanding 4.1.2 Name, Role, Value
 <a href="https://www.w3.org/WAI/tutorials/forms/labels/" target="_blank" rel="noopener">
 Form Labels (Tutorial)
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-&lt;!-- visible label --&gt;
-&lt;!-- before --&gt;
-&lt;input type="text" id="fullname"&gt;
-
-&lt;!-- after --&gt;
-&lt;label for="fullname"&gt;Full Name&lt;/label&gt;
-&lt;input type="text" id="fullname" name="fullname"&gt;
-
-&lt;!-- hidden label via aria-label --&gt;
-&lt;label class="visually-hidden" for="email"&gt;Email address&lt;/label&gt;
-&lt;input type="email" id="email" aria-labelledby="email"&gt;
-</code></pre>
-
 `.trim(),
     check: `() => {
       const unlabeled = Array.from(
@@ -268,13 +223,6 @@ Provide pause/stop or manual-advance controls; avoid auto-rotation unless initia
 <a href="https://www.w3.org/WAI/WCAG21/Understanding/timing-adjustable.html" target="_blank" rel="noopener">
 Understanding WCAG 2.2.1: Timing Adjustable.
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-&lt;div class="carousel" data-autoplay="false"&gt;
-  &lt;!-- user clicks ‘Next’ or ‘Previous’ --&gt;
-&lt;/div&gt;
-</code></pre>
 `.trim(),
     check: `() => {
       const selectors = [
@@ -311,14 +259,6 @@ Understanding WCAG 2.2.2: Pause, Stop, Hide
 <a href="https://www.accessibilitychecker.org/wcag-guides/ensure-elements-are-not-used/" target="_blank" rel="noopener">
 Why Marquee Elements Should Not be Used?
 </a>
-
-<strong>Example snippet</strong>
-<pre class="no-wrap"><code>
-/* disable blink and marquee animations */
-blink, marquee {
-  animation: none !important;
-}
-</code></pre>
 `.trim(),
   check: `() => {
       const flashEls = Array.from(document.querySelectorAll("blink, marquee"));
@@ -347,14 +287,6 @@ Add one or more <code>&lt;track kind="captions"&gt;</code> elements inside every
    target="_blank" rel="noopener">
 Understanding WCAG 1.2.2: Captions
 </a>
-
-<strong>Example snippet</strong>
-<pre class="no-wrap"><code>
-&lt;video controls&gt;
-  &lt;source src="promo.mp4" type="video/mp4"&gt;
-  &lt;track kind="captions" src="promo-en.vtt" srclang="en" label="English"&gt;
-&lt;/video&gt;
-</code></pre>
 `.trim(),
   check: `() => {
     const videos = Array.from(document.querySelectorAll("video"));
@@ -391,30 +323,6 @@ How to write well for your audience - GOV.UK.
    target="_blank" rel="noopener">
 Making Content Usable for People with Cognitive and Learning Disabilities - Section 4.4.
 </a>
-
-<strong>Example snippet</strong>
-<pre class="no-wrap"><code>
-&lt;!-- before --&gt;
-&lt;article&gt;
-  &lt;h1&gt;Page Title&lt;/h1&gt;
-  &lt;p&gt;Long introductory paragraph…&lt;/p&gt;
-  &lt;!-- rest of content --&gt;
-&lt;/article&gt;
-
-&lt;!-- After --&gt;
-&lt;section class="summary"&gt;
-  &lt;h2&gt;At a glance&lt;/h2&gt;
-  &lt;ul&gt;
-    &lt;li&gt;Key point one…&lt;/li&gt;
-    &lt;li&gt;Key point two…&lt;/li&gt;
-  &lt;/ul&gt;
-&lt;/section&gt;
-&lt;article&gt;
-  &lt;h1&gt;Page Title&lt;/h1&gt;
-  &lt;p&gt;Long introductory paragraph…&lt;/p&gt;
-  &lt;!-- rest of content --&gt;
-&lt;/article&gt;
-</code></pre>
 `.trim(),
   check: `() => {
   const articles = Array.from(document.querySelectorAll("article"));
@@ -457,25 +365,6 @@ Understanding 1.3.1: Info and Relationships
 <a href="https://allyant.com/blog/understanding-the-consistent-navigation-requirement-in-web-accessibility/" target="_blank" rel="noopener">
 Understanding the Consistent Navigation Requirement in Web Accessibility
 </a>
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-&lt;!-- before --&gt;
-<ul>
-  <li>&lt;a href="/"&gt;Home&lt;/a&gt;</li>
-  <li>&lt;a href="/about"&gt;About&lt;/a&gt;</li>
-</ul>
-
-&lt;!-- after --&gt;
-&lt;nav aria-label="Main navigation"&gt;
-  &lt;ul&gt;
-    &lt;li&gt;&lt;a href="/"&gt;Home&lt;/a&gt;&lt;/li&gt;
-    &lt;li&gt;&lt;a href="/about"&gt;About&lt;/a&gt;&lt;/li&gt;
-  &lt;/ul&gt;
-&lt;/nav&gt;
-
-&lt;!-- optional skip link --&gt;
-&lt;a href="#main-content" class="skip-link"&gt;Skip to main content&lt;/a&gt;
-</code></pre>
 `.trim(),
     check: `() => {
   // Find any native or ARIA navigation landmarks
@@ -508,19 +397,6 @@ Nielsen Norman on Menu Design
 <a href="https://medium.com/design-bootcamp/the-7-2-rule-the-real-science-behind-millers-law-that-will-shock-you-your-deepest-memory-4a35be25bb3b" target="_blank" rel="noopener">
 Background on Miller's 7+2 Rule
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href="/services"&gt;Services&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href="/pricing"&gt;Pricing&lt;/a&gt;&lt;/li&gt;
-  &lt;!-- group excess under “More” --&gt;
-  &lt;li&gt;
-    &lt;a href="#"&gt;More&lt;/a&gt;
-    &lt;ul class="submenu"&gt;…&lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-</code></pre>
 `.trim(),
     check: () => {
   const nav = document.querySelector("nav");
@@ -555,19 +431,6 @@ Plain English Campaign (a UK charity promoting clear, concise writing)
 <a href="https://www.plainenglish.co.uk/" target="_blank" rel="noopener">
 Plain English Campaign
 </a>
-
-<strong>Examples</strong>
-<pre class="no-wrap"><code>
-Before: “Please ascertain whether you are eligible to commence the programme.”
-
-After:  “Please find out if you can start the programme.”
-</code></pre>
-
-<pre class="no-wrap"><code>
-Before: “We will utilise the system to ameliorate performance.”
-
-After:  “We will use the system to improve performance.”
-</code></pre>
 `.trim(),
     check: `() => {
       function countSyllables(w) {
@@ -629,18 +492,6 @@ Introducing accessibility in typography
 <a href="https://reciteme.com/news/dyslexia-friendly-fonts/" target="_blank" rel="noopener">
 The 10 Best Dyslexia Friendly Fonts
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-body {
-  font-family:
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
-    Arial,
-    sans-serif;
-}
-</code></pre>
 `.trim(),
   check: `() => {
     // approved list of families (lowercase, no quotes)
@@ -707,12 +558,6 @@ Understanding 1.4.12: Text Spacing
 <a href="https://cdn.bdadyslexia.org.uk/uploads/documents/Advice/style-guide/BDA-Style-Guide-2023.pdf?v=1680514568" target="_blank" rel="noopener">
 Dyslexia Style Guide
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-html { font-size: 100%; /* 16px */ }
-p    { font-size: 1rem; }
-</code></pre>
 `.trim(),
     check: `() => {
       // Check paragraphs, list items, links and labels
@@ -754,9 +599,6 @@ Understanding 1.4.12: Text Spacing
 <a href="https://cdn.bdadyslexia.org.uk/uploads/documents/Advice/style-guide/BDA-Style-Guide-2023.pdf?v=1680514568" target="_blank" rel="noopener">
 Dyslexia Style Guide
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>body { letter-spacing: 0.35em; }</code></pre>
 `.trim(),
     check: `() => {
       // Sample paragraphs, list items, links and labels
@@ -795,15 +637,6 @@ This check flags only pure-white backgrounds. For full WCAG-compliant contrast t
 <a href="https://webaim.org/resources/contrastchecker/ target="_blank" rel="noopener">
 Contrast Checker by WebAim
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-/* reduce glare by switching pure white to off-white */
-body {
-  background-color: #f5f5f5;
-  color: #1a2930;
-}
-</code></pre>
   `.trim(),
   check: `() => {
     const bad = new Set();
@@ -856,9 +689,6 @@ Understanding 1.4.8: Visual Representation
 <a href="https://www.boia.org/blog/why-justified-or-centered-text-is-bad-for-accessibility" target="_blank" rel="noopener">
 Why Justified (or Centered) Text is Bad for Accessibility?
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>p { text-align: left; }</code></pre>
 `.trim(),
   check: `() => {
     const all = Array.from(document.querySelectorAll("*"));
@@ -911,15 +741,6 @@ Best Practices of Typography
 <a href="https://design.homeoffice.gov.uk/accessibility/page-structure/layout-typography" target="_blank" rel="noopener">
 GOV.UK Advice on Layout and Typography
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-&lt;!-- before --&gt;
-&lt;p&gt;&lt;em&gt;This is important&lt;/em&gt;&lt;/p&gt;
-
-&lt;!-- after --&gt;
-&lt;p&gt;&lt;strong&gt;This is important&lt;/strong&gt;&lt;/p&gt;
-</code></pre>
 `.trim(),
     check: `() => {
       const bad = new Set();
@@ -991,19 +812,6 @@ Underatanding WCAG 3.2.2: On Input
 <a href="https://www.w3.org/WAI/WCAG21/Understanding/status-messages.html" target="_blank" rel="noopener">
 Underatanding WCAG 4.1.3: Status Messages
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>
-/* stop the browser from auto-focusing */
-[autofocus] {
-  outline: none;
-}
-
-/* switch assertive announcements to polite */
-[aria-live="assertive"] {
-  aria-live: polite;
-}
-</code></pre>
 `.trim(),
     check: `() => {
       // Helper: build a concise, deduped snippet or use aria-label
@@ -1097,9 +905,6 @@ Remove any <code>&lt;meta http-equiv="refresh"&gt;</code> tags and disable autom
 <a href="https://www.w3.org/WAI/WCAG21/Understanding/timing-adjustable.html" target="_blank" rel="noopener">
 Understanding WCAG 2.2.1: Timing Adjustable
 </a>
-
-<strong>Example Snippet</strong>
-<pre class="no-wrap"><code>&lt;button onclick="window.location.reload()"&gt;Refresh content&lt;/button&gt;</code></pre>
 `.trim(),
   check: `() => {
     const issues = [];
@@ -1198,19 +1003,6 @@ Remove or slow any blinking or flashing effects so they do not cycle more than t
    target="_blank" rel="noopener">
 Understanding 2.3.2: Three Flashes
 </a>
-
-<strong>Example snippet</strong><br>
-<pre class="no-wrap"><code>
-/* slow down or remove rapid blink */
-@keyframes blink {
-  0%,100% { opacity: 1; }
-  50%      { opacity: 0; }
-}
-/* instead of 0.2s (5×/sec), use ≥0.34s (≤3×/sec) */
-.blinking {
-  animation: blink 0.34s infinite;
-}
-</code></pre>
   `.trim(),
   check: `() => {
     // Grab every element and track its opacity over one second
