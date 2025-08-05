@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Readability Checker</title>
   <link rel="stylesheet" href="styles.css" />
-  <!-- Favicon -->
   <link
     rel="icon"
     type="image/png"
@@ -27,8 +26,10 @@
 
   <main class="container" role="main">
     <div class="card" aria-labelledby="readability-form-heading">
-      <h2 id="readability-form-heading"
-          style="margin-bottom:1rem; font-size:1.25rem; color:var(--color-text);">
+      <h2
+        id="readability-form-heading"
+        style="margin-bottom:1rem; font-size:1.25rem; color:var(--color-text);"
+      >
         Enter a URL to Check Readability
       </h2>
 
@@ -44,7 +45,6 @@
         <button type="submit">Check Readability</button>
       </form>
 
-      <!-- loading hidden by default -->
       <div id="loading" aria-live="polite" style="display: none;">
         <span class="loader" aria-hidden="true"></span>
         <strong>Analyzing readability…</strong><br>
@@ -53,8 +53,11 @@
 
       <div id="summary"></div>
 
-      <div id="legend" class="legend-container">
-        <!-- Left column: Reading Ease -->
+      <div
+        id="legend"
+        class="legend-container"
+        style="display: none;"
+      >
         <div class="legend-column">
           <h4>Reading Ease <small>(0–100; higher = easier)</small></h4>
           <dl>
@@ -64,7 +67,6 @@
             <dd>• 0–29   = Very confusing</dd>
           </dl>
         </div>
-        <!-- Right column: Estimated Level -->
         <div class="legend-column">
           <h4>Estimated Level</h4>
           <dl>
@@ -76,7 +78,6 @@
         </div>
       </div>
 
-      <!-- color-legend & filter hidden until results -->
       <div id="color-legend" style="display: none;">
         <h4>What the Table Colours Mean</h4>
         <dl>
@@ -106,9 +107,7 @@
       id="readability-results-container"
       role="region"
       aria-labelledby="readability-results-heading"
-    >
-      <!-- Results table will be injected here -->
-    </div>
+    ></div>
   </main>
 
   <script>
@@ -117,6 +116,7 @@
     const summaryEl   = document.getElementById("summary");
     const filterCb    = document.getElementById("show-problems-only");
     const results     = document.getElementById("readability-results-container");
+    const legendEl    = document.getElementById("legend");
     const colorLegend = document.getElementById("color-legend");
     const filterDiv   = document.getElementById("filter");
 
@@ -149,12 +149,12 @@
       sourceUrl = document.getElementById("url").value.trim();
       if (!sourceUrl) return;
 
-      // show loading
-      loading.style.display   = "block";
-      summaryEl.innerHTML     = "";
-      results.innerHTML       = "";
+      loading.style.display     = "block";
+      summaryEl.innerHTML       = "";
+      results.innerHTML         = "";
 
-      // hide legends & filter
+      // hide legends until results arrive
+      legendEl.style.display    = "none";
       colorLegend.style.display = "none";
       filterDiv.style.display   = "none";
 
@@ -273,7 +273,8 @@
       html += `</tbody></table>`;
       results.innerHTML = html;
 
-      // show color legend & filter now that we have results
+      // reveal all legends now that we have results
+      legendEl.style.display    = "block";
       colorLegend.style.display = "block";
       filterDiv.style.display   = "block";
     }
